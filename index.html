@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Muhammad Syafiq Saputra — Network & Security Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-0:#070b13;
+    --bg-1:#0b1220;
+    --glass:rgba(255,255,255,0.045);
+    --glass-brd:rgba(255,255,255,0.09);
+    --glass-brd-hi:rgba(56,220,255,0.35);
+    --cyan:#38dcff;
+    --green:#4dffa0;
+    --amber:#ffb454;
+    --text-0:#eef3f8;
+    --text-1:#a7b3c4;
+    --text-2:#6b7688;
+    --mono:'JetBrains Mono', monospace;
+    --sora:'Sora', sans-serif;
+    --inter:'Inter', sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:
+      radial-gradient(ellipse 900px 600px at 15% -10%, rgba(56,220,255,0.10), transparent 60%),
+      radial-gradient(ellipse 800px 700px at 90% 20%, rgba(77,255,160,0.06), transparent 55%),
+      linear-gradient(180deg, var(--bg-0), var(--bg-1) 40%, var(--bg-0));
+    color:var(--text-0);
+    font-family:var(--inter);
+    min-height:100vh;
+    overflow-x:hidden;
+    position:relative;
+  }
+  #netcanvas{position:fixed; inset:0; z-index:0; opacity:0.55; pointer-events:none;}
+
+  ::selection{background:rgba(56,220,255,0.3); color:#fff;}
+
+  a{color:inherit; text-decoration:none;}
+  .wrap{max-width:1100px; margin:0 auto; padding:0 28px; position:relative; z-index:2;}
+
+  /* ---------- NAV ---------- */
+  header{
+    position:sticky; top:0; z-index:50;
+    backdrop-filter:blur(16px) saturate(140%);
+    -webkit-backdrop-filter:blur(16px) saturate(140%);
+    background:rgba(7,11,19,0.55);
+    border-bottom:1px solid var(--glass-brd);
+  }
+  nav.wrap{display:flex; align-items:center; justify-content:space-between; padding-top:18px; padding-bottom:18px;}
+  .logo{font-family:var(--mono); font-size:14px; letter-spacing:0.5px; color:var(--text-0); display:flex; align-items:center; gap:8px;}
+  .logo .dot{width:8px; height:8px; border-radius:50%; background:var(--green); box-shadow:0 0 10px var(--green); animation:pulse 2s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:1;} 50%{opacity:0.35;}}
+  .navlinks{display:flex; gap:28px; font-size:13px; font-family:var(--mono); color:var(--text-1);}
+  .navlinks a{transition:color .2s; position:relative;}
+  .navlinks a:hover{color:var(--cyan);}
+  .navlinks span{color:var(--text-2);}
+  @media(max-width:720px){ .navlinks{display:none;} }
+
+  /* ---------- GLASS PANEL BASE ---------- */
+  .glass{
+    background:var(--glass);
+    border:1px solid var(--glass-brd);
+    backdrop-filter:blur(18px) saturate(150%);
+    -webkit-backdrop-filter:blur(18px) saturate(150%);
+    border-radius:18px;
+    box-shadow:0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+  .glass:hover{border-color:var(--glass-brd-hi);}
+
+  /* ---------- HERO ---------- */
+  .hero{padding:96px 0 70px; position:relative;}
+  .eyebrow{
+    font-family:var(--mono); font-size:12.5px; color:var(--green);
+    display:inline-flex; align-items:center; gap:10px; padding:7px 14px;
+    border-radius:100px; margin-bottom:26px;
+  }
+  .eyebrow::before{content:"●"; font-size:8px; color:var(--green); animation:pulse 2s ease-in-out infinite;}
+  h1.hero-name{
+    font-family:var(--sora); font-weight:800; letter-spacing:-1.5px;
+    font-size:clamp(34px, 6vw, 62px); line-height:1.05; color:var(--text-0);
+  }
+  h1.hero-name .accent{
+    background:linear-gradient(100deg, var(--cyan), var(--green));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .hero-role{
+    font-family:var(--mono); font-size:15px; color:var(--text-1); margin-top:16px;
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  }
+  .hero-role .caret{display:inline-block; width:9px; height:18px; background:var(--cyan); animation:blink 1s step-end infinite; vertical-align:middle;}
+  @keyframes blink{50%{opacity:0;}}
+  .hero-desc{max-width:640px; margin-top:26px; font-size:15.5px; line-height:1.75; color:var(--text-1);}
+  .hero-actions{display:flex; gap:14px; margin-top:34px; flex-wrap:wrap;}
+  .btn{
+    font-family:var(--mono); font-size:13px; padding:13px 22px; border-radius:12px;
+    cursor:pointer; transition:all .25s; display:inline-flex; align-items:center; gap:8px;
+  }
+  .btn-primary{background:linear-gradient(120deg, rgba(56,220,255,0.18), rgba(77,255,160,0.10)); border:1px solid var(--glass-brd-hi); color:var(--text-0);}
+  .btn-primary:hover{box-shadow:0 0 24px rgba(56,220,255,0.25); transform:translateY(-2px);}
+  .btn-ghost{border:1px solid var(--glass-brd); color:var(--text-1);}
+  .btn-ghost:hover{color:var(--text-0); border-color:var(--glass-brd-hi); transform:translateY(-2px);}
+
+  .hero-top{display:flex; align-items:center; justify-content:space-between; gap:48px;}
+  .hero-text{flex:1; min-width:0;}
+  @media(max-width:860px){ .hero-top{flex-direction:column; align-items:stretch; gap:36px;} }
+
+  .hero-photo-frame{
+    flex-shrink:0; width:230px; padding:14px; text-align:center;
+    display:flex; flex-direction:column; gap:10px; align-items:center;
+    animation:float 6s ease-in-out infinite;
+  }
+  @media(max-width:860px){ .hero-photo-frame{width:180px; margin:0 auto; animation:none;} }
+  @keyframes float{ 0%,100%{transform:translateY(0);} 50%{transform:translateY(-10px);} }
+  .hero-photo-slot{
+    width:100%; aspect-ratio:1/1; border-radius:14px; overflow:hidden;
+    background:linear-gradient(150deg, rgba(56,220,255,0.07), rgba(77,255,160,0.04));
+    border:1px dashed var(--glass-brd-hi);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px;
+    color:var(--text-2);
+  }
+  .hero-photo-slot img{width:100%; height:100%; object-fit:cover; display:block;}
+  .photo-placeholder-icon{width:38px; height:38px; color:var(--cyan); opacity:0.55;}
+  .photo-placeholder-text{font-family:var(--mono); font-size:11px; color:var(--text-2);}
+  .hero-photo-tag{font-family:var(--mono); font-size:10.5px; color:var(--text-2); letter-spacing:0.5px;}
+
+  .hero-panel{margin-top:56px; padding:22px 26px; font-family:var(--mono); font-size:13px; color:var(--text-1); line-height:2;}
+  .hero-panel .hd{display:flex; gap:8px; margin-bottom:14px;}
+  .hero-panel .hd i{width:10px; height:10px; border-radius:50%; display:inline-block;}
+  .hero-panel .r{background:#ff5f57;} .hero-panel .y{background:#febc2e;} .hero-panel .g{background:#28c840;}
+  .hero-panel .kv b{color:var(--cyan); font-weight:500;}
+  .hero-panel .kv .lbl{color:var(--text-2);}
+
+  /* ---------- SECTION HEADERS ---------- */
+  section{padding:70px 0;}
+  .sec-head{display:flex; align-items:baseline; gap:16px; margin-bottom:38px;}
+  .sec-num{font-family:var(--mono); font-size:12px; color:var(--text-2); border:1px solid var(--glass-brd); padding:4px 10px; border-radius:8px;}
+  .sec-title{font-family:var(--sora); font-weight:700; font-size:clamp(22px,3vw,30px); letter-spacing:-0.5px;}
+  .sec-line{flex:1; height:1px; background:linear-gradient(90deg, var(--glass-brd), transparent);}
+
+  /* ---------- ABOUT ---------- */
+  .about-grid{display:grid; grid-template-columns:1.3fr 1fr; gap:24px;}
+  @media(max-width:800px){.about-grid{grid-template-columns:1fr;}}
+  .about-card{padding:30px 32px; font-size:15px; line-height:1.85; color:var(--text-1);}
+  .about-card p + p{margin-top:14px;}
+  .about-card b{color:var(--text-0); font-weight:600;}
+  .stat-card{padding:26px; display:flex; flex-direction:column; gap:18px; justify-content:center;}
+  .stat{display:flex; align-items:center; justify-content:space-between; font-family:var(--mono); font-size:13px; color:var(--text-1); border-bottom:1px dashed var(--glass-brd); padding-bottom:14px;}
+  .stat:last-child{border-bottom:none; padding-bottom:0;}
+  .stat b{color:var(--cyan); font-size:15px;}
+
+  /* ---------- TIMELINE (education) ---------- */
+  .timeline{position:relative; padding-left:28px; border-left:1px solid var(--glass-brd);}
+  .t-item{position:relative; padding-bottom:6px;}
+  .t-item::before{content:""; position:absolute; left:-33px; top:6px; width:11px; height:11px; border-radius:50%; background:var(--bg-0); border:2px solid var(--cyan); box-shadow:0 0 12px rgba(56,220,255,0.5);}
+  .t-card{padding:24px 28px; margin-bottom:0;}
+  .t-year{font-family:var(--mono); font-size:12px; color:var(--green);}
+  .t-school{font-family:var(--sora); font-weight:700; font-size:18px; margin-top:6px;}
+  .t-major{color:var(--text-1); font-size:14px; margin-top:4px;}
+
+  /* ---------- SKILLS ---------- */
+  .skills-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:20px;}
+  @media(max-width:820px){.skills-grid{grid-template-columns:1fr;}}
+  .skill-card{padding:26px; }
+  .skill-card h3{font-family:var(--sora); font-size:16px; font-weight:700; margin-bottom:6px;}
+  .skill-card .desc{font-size:13px; color:var(--text-2); margin-bottom:16px; line-height:1.6;}
+  .tag-row{display:flex; flex-wrap:wrap; gap:8px;}
+  .tag{
+    font-family:var(--mono); font-size:11.5px; padding:6px 11px; border-radius:8px;
+    background:rgba(255,255,255,0.03); border:1px solid var(--glass-brd); color:var(--text-1);
+    transition:all .2s;
+  }
+  .tag:hover{border-color:var(--glass-brd-hi); color:var(--cyan);}
+
+  /* ---------- FOCUS AREAS ---------- */
+  .focus-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:20px;}
+  @media(max-width:800px){.focus-grid{grid-template-columns:1fr;}}
+  .focus-card{padding:26px 28px;}
+  .focus-tag{font-family:var(--mono); font-size:11px; color:var(--amber); letter-spacing:0.5px;}
+  .focus-card h3{font-family:var(--sora); font-size:17px; font-weight:700; margin:8px 0 10px;}
+  .focus-card p{font-size:13.5px; color:var(--text-1); line-height:1.7;}
+
+  /* ---------- CERTS ---------- */
+  .cert-groups{display:flex; flex-direction:column; gap:34px;}
+  .cert-group-title{font-family:var(--mono); font-size:12.5px; color:var(--text-2); text-transform:uppercase; letter-spacing:1px; margin-bottom:14px; display:flex; align-items:center; gap:10px;}
+  .cert-group-title::after{content:""; flex:1; height:1px; background:var(--glass-brd);}
+  .cert-list{display:grid; grid-template-columns:repeat(2,1fr); gap:16px;}
+  @media(max-width:800px){.cert-list{grid-template-columns:1fr;}}
+  .cert-card{padding:20px 22px; display:flex; align-items:flex-start; gap:14px;}
+  .cert-icon{width:38px; height:38px; border-radius:10px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-family:var(--mono); font-size:14px; font-weight:600; background:rgba(56,220,255,0.08); border:1px solid var(--glass-brd-hi); color:var(--cyan);}
+  .cert-body .name{font-family:var(--sora); font-weight:600; font-size:14.5px; line-height:1.4;}
+  .cert-body .meta{font-family:var(--mono); font-size:11.5px; color:var(--text-2); margin-top:6px;}
+
+  /* ---------- PROJECTS ---------- */
+  .proj-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:20px;}
+  @media(max-width:800px){.proj-grid{grid-template-columns:1fr;}}
+  .proj-card{padding:26px 28px; position:relative; overflow:hidden;}
+  .proj-num{font-family:var(--mono); font-size:11px; color:var(--text-2);}
+  .proj-card h3{font-family:var(--sora); font-weight:700; font-size:16.5px; margin:10px 0 10px;}
+  .proj-card p{font-size:13.5px; color:var(--text-1); line-height:1.7;}
+
+  /* ---------- CONTACT ---------- */
+  .contact-panel{padding:46px 40px; text-align:center;}
+  .contact-panel h2{font-family:var(--sora); font-size:clamp(24px,4vw,34px); font-weight:800; letter-spacing:-0.5px;}
+  .contact-panel .sub{color:var(--text-1); margin-top:12px; font-size:14.5px; max-width:480px; margin-left:auto; margin-right:auto; line-height:1.7;}
+  .contact-links{display:flex; justify-content:center; gap:16px; margin-top:30px; flex-wrap:wrap;}
+  .clink{padding:13px 20px; font-family:var(--mono); font-size:13px; display:flex; align-items:center; gap:9px;}
+
+  /* ---------- CERT FILTERS ---------- */
+  .cert-filters{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:28px;}
+  .filter-btn{
+    font-family:var(--mono); font-size:12px; padding:9px 16px; border-radius:100px;
+    background:transparent; border:1px solid var(--glass-brd); color:var(--text-1);
+    cursor:pointer; transition:all .2s;
+  }
+  .filter-btn:hover{color:var(--text-0); border-color:var(--glass-brd-hi);}
+  .filter-btn.active{
+    background:linear-gradient(120deg, rgba(56,220,255,0.18), rgba(77,255,160,0.10));
+    border-color:var(--glass-brd-hi); color:var(--text-0);
+  }
+  .cert-group{transition:opacity .3s ease, transform .3s ease;}
+  .cert-group.hidden{display:none;}
+
+  /* ---------- TERMINAL ---------- */
+  .term-window{overflow:hidden; padding:0;}
+  .term-bar{display:flex; align-items:center; gap:14px; padding:14px 20px; border-bottom:1px solid var(--glass-brd);}
+  .term-path{font-family:var(--mono); font-size:12px; color:var(--text-2);}
+  .term-body{
+    padding:20px 22px; height:280px; overflow-y:auto;
+    font-family:var(--mono); font-size:13px; line-height:1.85; color:var(--text-1);
+  }
+  .term-line{white-space:pre-wrap; word-break:break-word;}
+  .term-line b{color:var(--cyan); font-weight:600;}
+  .term-line.cmd{color:var(--text-0);}
+  .term-line.cmd::before{content:"syafiq@tjkt:~$ "; color:var(--green);}
+  .term-line.err{color:#ff8080;}
+  .term-inputrow{
+    display:flex; align-items:center; gap:10px; padding:14px 22px;
+    border-top:1px solid var(--glass-brd); background:rgba(255,255,255,0.02);
+  }
+  .term-prompt{font-family:var(--mono); font-size:13px; color:var(--green); flex-shrink:0;}
+  .term-input{
+    flex:1; background:transparent; border:none; outline:none;
+    font-family:var(--mono); font-size:13px; color:var(--text-0);
+  }
+  .term-input::placeholder{color:var(--text-2);}
+  .term-body::-webkit-scrollbar{width:7px;}
+  .term-body::-webkit-scrollbar-thumb{background:rgba(56,220,255,0.2); border-radius:10px;}
+
+  /* ---------- TOAST ---------- */
+  .toast{
+    position:fixed; bottom:26px; left:50%; transform:translateX(-50%) translateY(20px);
+    padding:12px 20px; border-radius:12px; font-family:var(--mono); font-size:12.5px;
+    color:var(--text-0); z-index:200; opacity:0; pointer-events:none; transition:all .3s ease;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
+  /* clickable contact links cue */
+  .clink{cursor:pointer;}
+
+  footer{padding:32px 0 50px; text-align:center; font-family:var(--mono); font-size:11.5px; color:var(--text-2);}
+
+  ::-webkit-scrollbar{width:9px;}
+  ::-webkit-scrollbar-track{background:var(--bg-0);}
+  ::-webkit-scrollbar-thumb{background:rgba(56,220,255,0.25); border-radius:10px;}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important; transition:none !important;}
+  }
+
+  .reveal{opacity:0; transform:translateY(18px); transition:opacity .7s ease, transform .7s ease;}
+  .reveal.in{opacity:1; transform:translateY(0);}
+
+  .hero-photo-slot img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+    border-radius:inherit;
+}
+</style>
+</head>
+<body>
+
+<canvas id="netcanvas"></canvas>
+
+<header>
+  <nav class="wrap">
+    <div class="logo"><span class="dot"></span>syafiq@tjkt:~$</div>
+    <div class="navlinks">
+      <a href="#about">whoami</a>
+      <a href="#skills">skills</a>
+      <a href="#certs">certs</a>
+      <a href="#projects">projects</a>
+      <a href="#terminal">terminal</a>
+      <a href="#contact">contact</a>
+    </div>
+  </nav>
+</header>
+
+<main class="wrap">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-top">
+      <div class="hero-text">
+        <div class="eyebrow">status: open to internship / on-the-job training</div>
+        <h1 class="hero-name">Muhammad Syafiq<br><span class="accent">Saputra</span></h1>
+        <div class="hero-role">$ role <span style="color:var(--text-0)">— Network & Linux System Administration | Cyber Security Enthusiast</span><span class="caret"></span></div>
+        <p class="hero-desc">
+          Siswa TJKT (Teknik Jaringan Komputer dan Telekomunikasi) di SMK Wikrama Bogor dengan fokus pada
+          administrasi sistem Linux dan keamanan jaringan. Terbiasa mengelola server berbasis Linux,
+          mengimplementasikan layanan jaringan, serta menerapkan hardening dasar pada sistem dan infrastruktur.
+        </p>
+        <div class="hero-actions">
+          <a href="#certs" class="btn btn-primary">Lihat Sertifikasi ↓</a>
+          <a href="#contact" class="btn btn-ghost">Hubungi Saya</a>
+        </div>
+      </div>
+
+        <div class="hero-photo-frame glass">
+          <div class="hero-photo-slot" id="photoSlot">
+            <!-- GANTI DENGAN FOTO ASLI: hapus konten di dalam #photoSlot ini,
+                lalu tambahkan: <img src="foto-kamu.jpg" alt="Muhammad Syafiq Saputra"> -->
+            <img src="img/img.png" alt="">
+            <span class="photo-placeholder-text">taruh foto di sini</span>
+          </div>
+          <div class="hero-photo-tag">syafiq.jpg</div>
+        </div>
+      </div>
+
+    <div class="hero-panel glass">
+      <div class="hd"><i class="r"></i><i class="y"></i><i class="g"></i></div>
+      <div class="kv"><span class="lbl">domisili</span> &nbsp;: <b>Kabupaten Bogor, Jawa Barat</b></div>
+      <div class="kv"><span class="lbl">sekolah</span> &nbsp;&nbsp;: <b>SMK Wikrama Bogor (2024 – Sekarang)</b></div>
+      <div class="kv"><span class="lbl">jurusan</span> &nbsp;&nbsp;: <b>Teknik Jaringan Komputer & Telekomunikasi</b></div>
+      <div class="kv"><span class="lbl">stack</span> &nbsp;&nbsp;&nbsp;&nbsp;: <b>Linux · MikroTik · OPNsense · Docker · MariaDB</b></div>
+      <div class="kv"><span class="lbl">local_time</span> : <b id="liveClock">--:--:--</b></div>
+      <div class="kv"><span class="lbl">uptime</span> &nbsp;&nbsp;: <b id="uptimeCounter">calculating…</b></div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="sec-head"><span class="sec-num">01</span><span class="sec-title">whoami</span><div class="sec-line"></div></div>
+    <div class="about-grid">
+      <div class="about-card glass reveal">
+        <p>Saya adalah siswa <b>TJKT (Teknik Jaringan Komputer dan Telekomunikasi)</b> di SMK Wikrama Bogor
+        yang memiliki fokus pada <b>Linux System Administration</b> dan <b>Cyber Security</b>.</p>
+        <p>Memiliki pengalaman dalam mengelola server berbasis Linux, mengimplementasikan layanan jaringan,
+        serta menerapkan keamanan dasar pada sistem dan infrastruktur.</p>
+        <p>Aktif mempelajari administrasi sistem Linux, keamanan jaringan, hardening, server, dan monitoring
+        layanan untuk meningkatkan keandalan serta keamanan infrastruktur teknologi informasi.</p>
+      </div>
+      <div class="stat-card glass reveal">
+        <div class="stat"><span>Jurusan</span><b>TJKT</b></div>
+        <div class="stat"><span>Fokus Utama</span><b>Linux & Security</b></div>
+        <div class="stat"><span>Sertifikasi</span><b>6+</b></div>
+        <div class="stat"><span>Multi-Distro</span><b>Ubuntu · Debian · RHEL</b></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EDUCATION -->
+  <section id="education">
+    <div class="sec-head"><span class="sec-num">02</span><span class="sec-title">Pendidikan</span><div class="sec-line"></div></div>
+    <div class="timeline">
+      <div class="t-item reveal">
+        <div class="t-card glass">
+          <div class="t-year">2024 — Sekarang</div>
+          <div class="t-school">SMK Wikrama Bogor</div>
+          <div class="t-major">Jurusan Teknik Jaringan Komputer dan Telekomunikasi (TJKT)</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOCUS AREAS -->
+  <section id="focus">
+    <div class="sec-head"><span class="sec-num">03</span><span class="sec-title">Bidang Keahlian</span><div class="sec-line"></div></div>
+    <div class="focus-grid">
+      <div class="focus-card glass reveal">
+        <div class="focus-tag">// CYBER SECURITY</div>
+        <h3>Firewall & Segmentasi Jaringan</h3>
+        <p>Mengimplementasikan firewall dan segmentasi jaringan menggunakan OPNsense dalam konteks Security Operation Center (SOC).</p>
+      </div>
+      <div class="focus-card glass reveal">
+        <div class="focus-tag">// LINUX SYSTEM ADMINISTRATION</div>
+        <h3>Administrasi Sistem Multi-Distro</h3>
+        <p>Mengelola administrasi sistem pada Ubuntu, Debian, dan RHEL — meliputi user management, permissions, dan keamanan OS.</p>
+      </div>
+      <div class="focus-card glass reveal">
+        <div class="focus-tag">// NETWORKING & INFRASTRUCTURE</div>
+        <h3>Topologi & Perangkat Jaringan</h3>
+        <p>Merancang topologi jaringan lokal, konfigurasi perangkat MikroTik (VLAN), serta memahami integrasi dasar OLT dan Fiber Optic.</p>
+      </div>
+      <div class="focus-card glass reveal">
+        <div class="focus-tag">// DATABASE & CMS</div>
+        <h3>MariaDB & WordPress</h3>
+        <p>Manajemen database dasar dengan MariaDB dan pengembangan konten menggunakan WordPress.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section id="skills">
+    <div class="sec-head"><span class="sec-num">04</span><span class="sec-title">Tools & Teknologi</span><div class="sec-line"></div></div>
+    <div class="skills-grid">
+      <div class="skill-card glass reveal">
+        <h3>Networking</h3>
+        <div class="desc">Perangkat & konsep jaringan yang biasa saya kerjakan.</div>
+        <div class="tag-row">
+          <span class="tag">MikroTik RouterOS</span>
+          <span class="tag">VLAN</span>
+          <span class="tag">Firewall (NAT)</span>
+          <span class="tag">OLT</span>
+          <span class="tag">Fiber Optic</span>
+        </div>
+      </div>
+      <div class="skill-card glass reveal">
+        <h3>Sistem & Cloud</h3>
+        <div class="desc">Lingkungan sistem operasi dan cloud yang saya gunakan.</div>
+        <div class="tag-row">
+          <span class="tag">Linux (CLI)</span>
+          <span class="tag">RHEL</span>
+          <span class="tag">Ubuntu</span>
+          <span class="tag">AWS EC2</span>
+          <span class="tag">Docker</span>
+          <span class="tag">GitHub</span>
+          <span class="tag">Nginx</span>
+          <span class="tag">Apache</span>
+        </div>
+      </div>
+      <div class="skill-card glass reveal">
+        <h3>Database & CMS</h3>
+        <div class="desc">Pengelolaan data dan konten web.</div>
+        <div class="tag-row">
+          <span class="tag">MariaDB</span>
+          <span class="tag">WordPress</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CERTIFICATIONS -->
+  <section id="certs">
+    <div class="sec-head"><span class="sec-num">05</span><span class="sec-title">Sertifikasi Kompetensi Teknis</span><div class="sec-line"></div></div>
+    <div class="cert-filters">
+      <button class="filter-btn active" data-filter="all">Semua</button>
+      <button class="filter-btn" data-filter="aguna">Aguna Course</button>
+      <button class="filter-btn" data-filter="redhat">Red Hat</button>
+      <button class="filter-btn" data-filter="cisco">Cisco Networking Academy</button>
+    </div>
+    <div class="cert-groups">
+
+      <div class="reveal cert-group" data-category="aguna">
+        <div class="cert-group-title">Aguna Course</div>
+        <div class="cert-list">
+          <div class="cert-card glass">
+            <div class="cert-icon">N</div>
+            <div class="cert-body">
+              <div class="name">Network Fundamental</div>
+              <div class="meta">2025</div>
+            </div>
+          </div>
+          <div class="cert-card glass">
+            <div class="cert-icon">L</div>
+            <div class="cert-body">
+              <div class="name">Linux Fundamental</div>
+              <div class="meta">2025</div>
+            </div>
+          </div>
+          <div class="cert-card glass">
+            <div class="cert-icon">V</div>
+            <div class="cert-body">
+              <div class="name">Virtual Machine Fundamental</div>
+              <div class="meta">2024</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="reveal cert-group" data-category="redhat">
+        <div class="cert-group-title">Red Hat</div>
+        <div class="cert-list">
+          <div class="cert-card glass">
+            <div class="cert-icon">RH</div>
+            <div class="cert-body">
+              <div class="name">System Administration II</div>
+              <div class="meta">RH134 — Ver. 9.3</div>
+            </div>
+          </div>
+          <div class="cert-card glass">
+            <div class="cert-icon">RH</div>
+            <div class="cert-body">
+              <div class="name">Getting Started with Linux Fundamentals</div>
+              <div class="meta">RH104 — Ver. 9.1</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="reveal cert-group" data-category="cisco">
+        <div class="cert-group-title">Cisco Networking Academy · Digitalent Kominfo</div>
+        <div class="cert-list">
+          <div class="cert-card glass">
+            <div class="cert-icon">CS</div>
+            <div class="cert-body">
+              <div class="name">Introduction to Cybersecurity</div>
+              <div class="meta">2026 · offered by Digitalent_Kominfo</div>
+            </div>
+          </div>
+          <div class="cert-card glass">
+            <div class="cert-icon">CS</div>
+            <div class="cert-body">
+              <div class="name">Cybersecurity Essentials</div>
+              <div class="meta">2026 · offered by Digitalent_Kominfo</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="projects">
+    <div class="sec-head"><span class="sec-num">06</span><span class="sec-title">Proyek</span><div class="sec-line"></div></div>
+    <div class="proj-grid">
+      <div class="proj-card glass reveal">
+        <div class="proj-num">PROJECT / 01</div>
+        <h3>Integrasi MikroTik ke Cloud</h3>
+        <p>Membangun interkoneksi aman antara jaringan lokal dan server cloud melalui konfigurasi routing khusus dan manajemen bandwidth.</p>
+      </div>
+      <div class="proj-card glass reveal">
+        <div class="proj-num">PROJECT / 02</div>
+        <h3>Manajemen Server Linux</h3>
+        <p>Melakukan deployment web server menggunakan kombinasi Nginx dan MariaDB di lingkungan Linux secara lokal.</p>
+      </div>
+      <div class="proj-card glass reveal">
+        <div class="proj-num">PROJECT / 03</div>
+        <h3>Keamanan & Monitoring</h3>
+        <p>Menerapkan system hardening menggunakan UFW (Uncomplicated Firewall).</p>
+      </div>
+      <div class="proj-card glass reveal">
+        <div class="proj-num">PROJECT / 04</div>
+        <h3>Kontainerisasi Aplikasi Web</h3>
+        <p>Membangun custom image dan mengelola container menggunakan Docker untuk efisiensi dan konsistensi deployment aplikasi dari GitHub.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TERMINAL -->
+  <section id="terminal">
+    <div class="sec-head"><span class="sec-num">07</span><span class="sec-title">Coba Terminalnya</span><div class="sec-line"></div></div>
+    <div class="term-window glass reveal">
+      <div class="term-bar">
+        <div class="hd"><i class="r"></i><i class="y"></i><i class="g"></i></div>
+        <span class="term-path">syafiq@tjkt: ~</span>
+      </div>
+      <div class="term-body" id="termBody">
+        <div class="term-line">Selamat datang. Ketik <b>help</b> untuk melihat daftar perintah.</div>
+      </div>
+      <div class="term-inputrow">
+        <span class="term-prompt">syafiq@tjkt:~$</span>
+        <input type="text" id="termInput" class="term-input" autocomplete="off" spellcheck="false" placeholder="ketik perintah… lalu tekan Enter">
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="contact-panel glass reveal">
+      <h2>Mari terhubung.</h2>
+      <p class="sub">Terbuka untuk kesempatan magang, PKL, maupun kolaborasi proyek seputar jaringan, Linux, dan keamanan siber.</p>
+      <div class="contact-links">
+        <a class="clink glass" href="mailto:syafiqsaputra301@gmail.com" data-copy="syafiqsaputra301@gmail.com">✉ syafiqsaputra301@gmail.com</a>
+        <a class="clink glass" href="tel:+6289508437967" data-copy="+62 895 0843 7967">☎ +62 895 0843 7967</a>
+        <span class="clink glass" data-copy="Kabupaten Bogor, Jawa Barat">📍 Kabupaten Bogor, Jawa Barat</span>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div class="toast glass" id="toast"></div>
+
+<footer>© 2026 Muhammad Syafiq Saputra — built with glassmorphism, curiosity, and too many terminal tabs.</footer>
+
+<script>
+  // Reveal on scroll
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} });
+  }, {threshold:0.12});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+  // Network node background
+  const canvas = document.getElementById('netcanvas');
+  const ctx = canvas.getContext('2d');
+  let w, h, nodes;
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function resize(){
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = document.documentElement.scrollHeight;
+  }
+  function initNodes(){
+    const count = Math.min(70, Math.floor((w*h)/28000));
+    nodes = Array.from({length:count}, ()=>({
+      x: Math.random()*w, y: Math.random()*h,
+      vx:(Math.random()-0.5)*0.25, vy:(Math.random()-0.5)*0.25
+    }));
+  }
+  function step(){
+    ctx.clearRect(0,0,w,h);
+    for(const n of nodes){
+      if(!prefersReduced){ n.x+=n.vx; n.y+=n.vy; }
+      if(n.x<0||n.x>w) n.vx*=-1;
+      if(n.y<0||n.y>h) n.vy*=-1;
+    }
+    for(let i=0;i<nodes.length;i++){
+      for(let j=i+1;j<nodes.length;j++){
+        const a=nodes[i], b=nodes[j];
+        const dx=a.x-b.x, dy=a.y-b.y;
+        const dist=Math.sqrt(dx*dx+dy*dy);
+        if(dist<150){
+          ctx.strokeStyle = `rgba(56,220,255,${0.14*(1-dist/150)})`;
+          ctx.lineWidth=1;
+          ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+        }
+      }
+    }
+    for(const n of nodes){
+      ctx.fillStyle='rgba(56,220,255,0.55)';
+      ctx.beginPath(); ctx.arc(n.x,n.y,1.6,0,Math.PI*2); ctx.fill();
+    }
+    if(!prefersReduced) requestAnimationFrame(step);
+  }
+  resize(); initNodes(); step();
+  window.addEventListener('resize', ()=>{ resize(); initNodes(); });
+
+  // ---------- LIVE CLOCK + UPTIME ----------
+  const clockEl = document.getElementById('liveClock');
+  const uptimeEl = document.getElementById('uptimeCounter');
+  const startDate = new Date('2024-07-01T00:00:00');
+  function tickClock(){
+    const now = new Date();
+    clockEl.textContent = now.toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+    const diff = now - startDate;
+    const days = Math.floor(diff/(1000*60*60*24));
+    const hrs = Math.floor((diff/(1000*60*60))%24);
+    const mins = Math.floor((diff/(1000*60))%60);
+    uptimeEl.textContent = `${days}d ${hrs}h ${mins}m — belajar TJKT`;
+  }
+  tickClock(); setInterval(tickClock, 1000);
+
+  // ---------- CERT FILTER ----------
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  const certGroups = document.querySelectorAll('.cert-group');
+  filterBtns.forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      filterBtns.forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      const f = btn.dataset.filter;
+      certGroups.forEach(g=>{
+        g.classList.toggle('hidden', f!=='all' && g.dataset.category!==f);
+      });
+    });
+  });
+
+  // ---------- COPY TO CLIPBOARD ----------
+  const toast = document.getElementById('toast');
+  let toastTimer;
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=>toast.classList.remove('show'), 2200);
+  }
+  document.querySelectorAll('[data-copy]').forEach(el=>{
+    el.addEventListener('click', (e)=>{
+      const val = el.dataset.copy;
+      if(navigator.clipboard){
+        navigator.clipboard.writeText(val).then(()=> showToast(`Disalin: ${val}`));
+      } else {
+        showToast(val);
+      }
+    });
+  });
+
+  // ---------- INTERACTIVE TERMINAL ----------
+  const termBody = document.getElementById('termBody');
+  const termInput = document.getElementById('termInput');
+
+  function printLine(html, cls=''){
+    const div = document.createElement('div');
+    div.className = 'term-line ' + cls;
+    div.innerHTML = html;
+    termBody.appendChild(div);
+    termBody.scrollTop = termBody.scrollHeight;
+  }
+
+  const commands = {
+    help: () => `Perintah tersedia:
+  <b>whoami</b>      — tentang saya
+  <b>education</b>   — riwayat pendidikan
+  <b>skills</b>      — tools & teknologi
+  <b>certs</b>       — daftar sertifikasi
+  <b>projects</b>    — daftar proyek
+  <b>contact</b>     — info kontak
+  <b>ls</b>          — daftar bagian situs
+  <b>date</b>        — tanggal & waktu sekarang
+  <b>clear</b>       — bersihkan layar`,
+    whoami: () => `Muhammad Syafiq Saputra — siswa TJKT SMK Wikrama Bogor, fokus pada Linux System Administration dan Cyber Security. Terbiasa mengelola server Linux, layanan jaringan, dan hardening dasar infrastruktur.`,
+    about: () => commands.whoami(),
+    education: () => `SMK Wikrama Bogor — Teknik Jaringan Komputer dan Telekomunikasi (TJKT), 2024 – Sekarang.`,
+    skills: () => `Networking: MikroTik RouterOS, VLAN, Firewall (NAT), OLT, Fiber Optic
+Sistem & Cloud: Linux (CLI), RHEL, Ubuntu, AWS EC2, Docker, GitHub, Nginx, Apache
+Database & CMS: MariaDB, WordPress`,
+    certs: () => `Aguna Course: Network Fundamental (2025), Linux Fundamental (2025), Virtual Machine Fundamental (2024)
+Red Hat: RH134 System Administration II (Ver. 9.3), RH104 Getting Started with Linux Fundamentals (Ver. 9.1)
+Cisco Networking Academy: Introduction to Cybersecurity (2026), Cybersecurity Essentials (2026) — via Digitalent_Kominfo`,
+    projects: () => `1. Integrasi MikroTik ke Cloud
+2. Manajemen Server Linux (Nginx + MariaDB)
+3. Keamanan & Monitoring (UFW hardening)
+4. Kontainerisasi Aplikasi Web (Docker)`,
+    contact: () => `Email : syafiqsaputra301@gmail.com
+Telp  : +62 895 0843 7967
+Lokasi: Kabupaten Bogor, Jawa Barat`,
+    ls: () => `about/  education/  skills/  certs/  projects/  contact/`,
+    date: () => new Date().toLocaleString('id-ID', { dateStyle:'full', timeStyle:'medium' }),
+    clear: () => { termBody.innerHTML=''; return null; },
+    sudo: () => `Permission denied: kamu bukan root di sini 😄`,
+    neofetch: () => `syafiq@tjkt
+------------
+OS: Human (Linux enthusiast build)
+Shell: curiosity.sh
+Focus: Linux Sysadmin, Cyber Security
+Uptime: lihat panel hero di atas ↑`,
+  };
+
+  function runCommand(raw){
+    const trimmed = raw.trim();
+    if(!trimmed) return;
+    printLine(escapeHtml(trimmed), 'cmd');
+    const [cmd] = trimmed.toLowerCase().split(' ');
+    if(commands[cmd]){
+      const out = commands[cmd]();
+      if(out !== null && out !== undefined) printLine(out.replace(/\n/g,'<br>'));
+    } else {
+      printLine(`command not found: ${escapeHtml(cmd)} — ketik <b>help</b>`, 'err');
+    }
+  }
+  function escapeHtml(s){
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  termInput.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter'){
+      runCommand(termInput.value);
+      termInput.value = '';
+    }
+  });
+  document.querySelector('.term-window').addEventListener('click', ()=> termInput.focus());
+</script>
+
+</body>
+</html>
